@@ -72,7 +72,7 @@ th, td {{
 }}
 th {{
     background-color: #0078d7;
-    color: white;
+    color: orange;
     font-weight: bold;
 }}
 .metric-row td {{
@@ -90,8 +90,7 @@ th {{
 <div class="table-container">
     <table>
         <tr>
-            <th>Metric</th>
-            <th>Value</th>
+            <th>Scholar Metrics</th>
         </tr>
         <tr class="metric-row">
             <td>Citations</td>
