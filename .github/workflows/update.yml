@@ -15,8 +15,8 @@ jobs:
       # 1. Checkout repository
       - uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Prevents using GITHUB_TOKEN for push
-          fetch-depth: 0  # Ensures full history is available
+          persist-credentials: false
+          fetch-depth: 0
 
       # 2. Set up Python
       - name: Set up Python
@@ -32,11 +32,14 @@ jobs:
       - name: Run Scholar metrics script
         run: python update_metrics.py
 
-      # 5. Commit and push changes using github-push-action
+      # 5. Mark repo as safe to fix dubious ownership issue
+      - name: Mark repo as safe
+        run: git config --global --add safe.directory /github/workspace
+
+      # 6. Commit and push changes
       - name: Commit and push changes
         uses: ad-m/github-push-action@v0.5.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-          commit_message: "Update Scholar metrics"
           force: true
