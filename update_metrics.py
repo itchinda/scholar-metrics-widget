@@ -50,10 +50,10 @@ try:
     print(f"Metrics updated: Citations={citations}, h-index={h_index}, i10-index={i10_index}")
 
 except TimeoutException:
-    print("⏳ Fetching metrics took too long — skipping update.")
+    print("Fetching metrics took too long — skipping update.")
     sys.exit(1)
 except Exception as e:
-    print(f"❌ Error fetching metrics: {e}")
+    print(f"Error fetching metrics: {e}")
     sys.exit(1)
 finally:
     signal.alarm(0)  # Cancel timeout
