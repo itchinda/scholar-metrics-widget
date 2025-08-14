@@ -7,7 +7,7 @@ import sys
 # CONFIG
 # -----------------------------
 SCHOLAR_ID = "0BtIIxcAAAAJ"  # Replace with your Scholar ID
-API_KEY = os.getenv("SERPAPI_KEY")  # Must be set locally or in GitHub Actions
+API_KEY = os.getenv("SERPAPI_KEY")  # Must be set as GitHub secret or local env variable
 OUTPUT_FILE = "index.html"
 
 if not API_KEY:
