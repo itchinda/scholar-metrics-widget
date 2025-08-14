@@ -3,34 +3,33 @@ import requests
 from datetime import datetime
 
 # -----------------------------
-# 1. CONFIGURATION
+# CONFIGURATION
 # -----------------------------
-SCHOLAR_ID = "0BtIIxcAAAAJ"  # replace with your Scholar user ID
-SERPAPI_KEY = "YOUR_SERPAPI_KEY"  # or use os.environ["SERPAPI_KEY"] in GitHub Actions
+SCHOLAR_ID = "0BtIIxcAAAAJ"  # Replace with your Scholar ID
+SERPAPI_KEY = "YOUR_SERPAPI_KEY"  # Or use os.environ["SERPAPI_KEY"]
 
 # -----------------------------
-# 2. FETCH DATA FROM SerpAPI
+# FETCH DATA FROM SerpAPI
 # -----------------------------
 url = f"https://serpapi.com/search.json?engine=google_scholar_author&author_id={SCHOLAR_ID}&hl=en&api_key={SERPAPI_KEY}"
 resp = requests.get(url)
 data = resp.json()
 
 # -----------------------------
-# 3. EXTRACT METRICS
+# EXTRACT METRICS
 # -----------------------------
 try:
-    cited_by_table = data["cited_by"]["table"][0]["citations"]
-    citations = cited_by_table.get("all", "N/A")
-    h_index = data["cited_by"]["table"][1]["h_index"].get("all", "N/A")
-    i10_index = data["cited_by"]["table"][2]["i10_index"].get("all", "N/A")
-except Exception as e:
-    print("Error parsing metrics:", e)
+    citations = data["cited_by"]["table"][0]["citations"]["all"]
+    h_index   = data["cited_by"]["table"][1]["h_index"]["all"]
+    i10_index = data["cited_by"]["table"][2]["i10_index"]["all"]
+except (KeyError, IndexError, TypeError):
     citations = h_index = i10_index = "N/A"
 
 # -----------------------------
-# 4. GENERATE HTML TABLE
+# GENERATE HTML TABLE
 # -----------------------------
 now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
 html_content = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -102,7 +101,7 @@ th {{
 """
 
 # -----------------------------
-# 5. WRITE TO FILE
+# WRITE HTML FILE
 # -----------------------------
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
