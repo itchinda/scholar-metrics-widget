@@ -71,8 +71,8 @@ th, td {{
     border-bottom: 1px solid #ddd;
 }}
 th {{
-    background-color: #FFFFFF;
-    color: orange;
+    background-color: #f9f9f9;
+    color: black;
     font-weight: bold;
 }}
 .metric-row td {{
