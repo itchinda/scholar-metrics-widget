@@ -7,11 +7,11 @@ import sys
 # CONFIG
 # -----------------------------
 SCHOLAR_ID = "0BtIIxcAAAAJ"  # Replace with your Scholar ID
-API_KEY = os.getenv("SERPAPI_KEY")
+API_KEY = os.getenv("SERPAPI_KEY")  # Must be set locally or in GitHub Actions
 OUTPUT_FILE = "index.html"
 
 if not API_KEY:
-    print("❌ SERPAPI_KEY environment variable not set.")
+    print("❌ SERPAPI_KEY not set. Set it as an environment variable or GitHub secret.")
     sys.exit(1)
 
 # -----------------------------
@@ -37,17 +37,18 @@ except ValueError:
 # -----------------------------
 # SAFE PARSING OF METRICS
 # -----------------------------
-try:
-    # New SerpAPI structure
-    author = data.get("author", {})
-    cited_by = author.get("cited_by", {})
-    citations = cited_by.get("total", "N/A")
-    h_index = author.get("h_index", "N/A")
-    i10_index = author.get("i10_index", "N/A")
-except Exception as e:
-    print(f"❌ Error parsing metrics: {e}")
-    print(data)  # full JSON for debugging
-    sys.exit(1)
+cited_table = data.get("cited_by", {}).get("table", [])
+
+def get_all(metric_name):
+    """Return the 'all' value from the cited_by table for the given metric."""
+    for entry in cited_table:
+        if metric_name in entry:
+            return entry[metric_name].get("all", "N/A")
+    return "N/A"
+
+citations = get_all("citations")
+h_index = get_all("h_index")
+i10_index = get_all("i10_index")
 
 # -----------------------------
 # GENERATE HTML
