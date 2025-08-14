@@ -2,7 +2,7 @@ name: Update Scholar Metrics
 
 on:
   schedule:
-    - cron: "0 6 * * *"  # Run daily at 06:00 UTC
+    - cron: "0 6 * * *"  # daily at 06:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
     steps:
       # 1. Checkout repository
       - uses: actions/checkout@v3
         with:
-          persist-credentials: false
           fetch-depth: 0
 
       # 2. Set up Python
@@ -32,14 +32,17 @@ jobs:
       - name: Run Scholar metrics script
         run: python update_metrics.py
 
-      # 5. Mark repo as safe to fix dubious ownership issue
-      - name: Mark repo as safe
-        run: git config --global --add safe.directory /github/workspace
+      # 5. Configure git with PAT for push
+      - name: Configure git with PAT
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
+          git config --global --add safe.directory /github/workspace
 
       # 6. Commit and push changes
       - name: Commit and push changes
-        uses: ad-m/github-push-action@v0.5.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          force: true
+        run: |
+          git add index.html
+          git diff --cached --quiet || git commit -m "Update Scholar metrics"
+          git push origin main
