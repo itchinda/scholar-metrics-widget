@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
     steps:
     # 1. Checkout repository
@@ -29,12 +30,12 @@ jobs:
     - name: Run Scholar metrics script
       run: python update_metrics.py
 
-    # 5. Configure git to use GITHUB_TOKEN
-    - name: Setup git authentication
+    # 5. Configure git with PAT
+    - name: Configure git with PAT
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
 
     # 6. Commit and push updated index.html
     - name: Commit and push changes
