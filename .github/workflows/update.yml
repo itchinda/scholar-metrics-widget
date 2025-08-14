@@ -29,11 +29,16 @@ jobs:
     - name: Run Scholar metrics script
       run: python update_metrics.py
 
-    # 5. Commit and push updated index.html using GITHUB_TOKEN
-    - name: Commit and push changes
+    # 5. Configure git to use GITHUB_TOKEN
+    - name: Setup git authentication
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+    # 6. Commit and push updated index.html
+    - name: Commit and push changes
+      run: |
         git add index.html
         git diff --cached --quiet || git commit -m "Update Scholar metrics"
-        git push "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref }}
+        git push origin main
