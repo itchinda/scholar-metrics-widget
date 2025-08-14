@@ -1,29 +1,43 @@
 import json
 import requests
 from datetime import datetime
+import os
 
 # -----------------------------
 # CONFIGURATION
 # -----------------------------
 SCHOLAR_ID = "0BtIIxcAAAAJ"  # Replace with your Scholar ID
-SERPAPI_KEY = "YOUR_SERPAPI_KEY"  # Or use os.environ["SERPAPI_KEY"]
+SERPAPI_KEY = os.environ.get("SERPAPI_KEY", "YOUR_SERPAPI_KEY")  # or set as environment variable
 
 # -----------------------------
-# FETCH DATA FROM SerpAPI
+# HELPER FUNCTION
+# -----------------------------
+def safe_get(d, path, default="N/A"):
+    """Safely get nested dictionary/list value using a path of keys/indexes."""
+    try:
+        for p in path:
+            d = d[p]
+        return d
+    except (KeyError, IndexError, TypeError):
+        return default
+
+# -----------------------------
+# FETCH DATA FROM SERPAPI
 # -----------------------------
 url = f"https://serpapi.com/search.json?engine=google_scholar_author&author_id={SCHOLAR_ID}&hl=en&api_key={SERPAPI_KEY}"
 resp = requests.get(url)
 data = resp.json()
 
+# Ensure SerpAPI returned a successful result
+if data.get("search_metadata", {}).get("status") != "Success":
+    raise ValueError("SerpAPI did not return a successful response. Check your Scholar ID and API key.")
+
 # -----------------------------
 # EXTRACT METRICS
 # -----------------------------
-try:
-    citations = data["cited_by"]["table"][0]["citations"]["all"]
-    h_index   = data["cited_by"]["table"][1]["h_index"]["all"]
-    i10_index = data["cited_by"]["table"][2]["i10_index"]["all"]
-except (KeyError, IndexError, TypeError):
-    citations = h_index = i10_index = "N/A"
+citations = safe_get(data, ["cited_by", "table", 0, "citations", "all"])
+h_index   = safe_get(data, ["cited_by", "table", 1, "h_index", "all"])
+i10_index = safe_get(data, ["cited_by", "table", 2, "i10_index", "all"])
 
 # -----------------------------
 # GENERATE HTML TABLE
@@ -101,7 +115,7 @@ th {{
 """
 
 # -----------------------------
-# WRITE HTML FILE
+# WRITE TO FILE
 # -----------------------------
 with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
