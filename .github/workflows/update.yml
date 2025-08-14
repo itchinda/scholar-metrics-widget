@@ -1,37 +1,43 @@
-name: Update Scholar metrics
+name: Update Scholar Metrics
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 6 * * *"  # daily at 06:00 UTC
   workflow_dispatch:
 
 jobs:
-  update-metrics:
+  update:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
+    env:
+      SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+      # PAT_TOKEN: ${{ secrets.PAT_TOKEN }} # You don't need this if you're using it in the git remote command
 
-      - name: Setup Python
+    steps:
+      # 1. Checkout repository with PAT to get write permissions
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      # 2. Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
+      # 3. Install dependencies
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install beautifulsoup4 requests
+        run: pip install requests beautifulsoup4
 
-      - name: Update metrics
+      # 4. Run Scholar metrics script
+      - name: Run Scholar metrics script
         run: python update_metrics.py
 
-      - name: Commit and Push
+      # 5. Commit and push changes
+      - name: Commit and Push changes
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Update Scholar metrics"
+          git commit -m "Update Scholar metrics" || echo "No changes to commit"
           git push
