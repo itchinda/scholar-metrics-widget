@@ -2,7 +2,7 @@ name: Update Scholar Metrics
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # daily 06:00 UTC
+    - cron: "0 6 * * *"  # Run daily at 06:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -10,36 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
     steps:
-    # 1. Checkout repository
-    - uses: actions/checkout@v3
+      # 1. Checkout repository
+      - uses: actions/checkout@v3
 
-    # 2. Set up Python
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-    # 3. Install dependencies
-    - name: Install dependencies
-      run: pip install requests
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: pip install requests
 
-    # 4. Run Scholar metrics script
-    - name: Run Scholar metrics script
-      run: python update_metrics.py
+      # 4. Run Scholar metrics script
+      - name: Run Scholar metrics script
+        run: python update_metrics.py
 
-    # 5. Configure git with PAT
-    - name: Configure git with PAT
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
-
-    # 6. Commit and push updated index.html
-    - name: Commit and push changes
-      run: |
-        git add index.html
-        git diff --cached --quiet || git commit -m "Update Scholar metrics"
-        git push origin main
+      # 5. Commit and push changes using github-push-action
+      - name: Commit and push changes
+        uses: ad-m/github-push-action@v0.11.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          commit_message: "Update Scholar metrics"
+          force: true
