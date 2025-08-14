@@ -3,7 +3,7 @@ import sys
 from scholarly import scholarly
 
 # CONFIG — your Google Scholar author ID (the part after "user=" in your profile URL)
-SCHOLAR_ID = "AbCdEfGhIJk"
+SCHOLAR_ID = "0BtIIxcAAAAJ"
 
 # Timeout handler
 class TimeoutException(Exception):
