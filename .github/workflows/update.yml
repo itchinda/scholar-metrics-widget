@@ -14,6 +14,9 @@ jobs:
     steps:
       # 1. Checkout repository
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Prevents using GITHUB_TOKEN for push
+          fetch-depth: 0  # Ensures full history is available
 
       # 2. Set up Python
       - name: Set up Python
@@ -31,7 +34,7 @@ jobs:
 
       # 5. Commit and push changes using github-push-action
       - name: Commit and push changes
-        uses: ad-m/github-push-action@v0.11.0
+        uses: ad-m/github-push-action@v0.5.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
