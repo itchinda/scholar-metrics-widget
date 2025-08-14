@@ -71,7 +71,7 @@ th, td {{
     border-bottom: 1px solid #ddd;
 }}
 th {{
-    background-color: #0078d7;
+    background-color: #FFFFFF;
     color: orange;
     font-weight: bold;
 }}
