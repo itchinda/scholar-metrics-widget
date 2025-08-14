@@ -1,35 +1,31 @@
 name: Update Scholar Metrics
 
-# Run daily at 06:00 UTC, and allow manual trigger
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *"   # daily 06:00 UTC
   workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
 
     steps:
-    # 1. Checkout repository
     - uses: actions/checkout@v3
 
-    # 2. Set up Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
-    # 3. Install dependencies
     - name: Install dependencies
-      run: pip install scholarly
+      run: pip install requests
 
-    # 4. Run the update script
     - name: Run Scholar metrics script
       run: python update_metrics.py
 
-    # 5. Commit and push updated index.html
-    - name: Commit and push changes
+    - name: Commit and push updated index.html
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
